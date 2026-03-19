@@ -12,3 +12,7 @@ class EntryResponse(BaseModel):
     payment_status: str
     entry_time: datetime
     message: str
+
+
+class CheckoutRequest(BaseModel):
+    exit_gate_id: str
