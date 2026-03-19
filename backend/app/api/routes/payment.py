@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.core.storage import sessions
+from app.core.storage import sessions, commands
 
 router = APIRouter()
 
@@ -22,6 +22,16 @@ def pay_session(token: str):
     # 3. simular pago
     session["payment_status"] = "APPROVED"
     session["status"] = "PAID"
+
+    command = {
+    "command_id": len(commands) + 1,
+    "device_id": "gate-exit-001",
+    "command_type": "OPEN_EXIT_GATE",
+    "session_token": token,
+    "status": "PENDING",
+    }
+    commands.append(command)
+
 
     return {
         "session_token": token,
