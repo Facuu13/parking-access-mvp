@@ -55,6 +55,36 @@ function App() {
     }
   }
 
+  const checkoutSession = async () => {
+    try {
+      setError("")
+
+      if (!token.trim()) {
+        throw new Error("Ingresá un token")
+      }
+
+      const response = await fetch(`${API_URL}/sessions/${token}/checkout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          exit_gate_id: "gate-exit-001",
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || "No se pudo hacer checkout")
+      }
+
+      const data = await response.json()
+      setSession(data)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h1>Parking Access MVP</h1>
@@ -71,7 +101,12 @@ function App() {
           onChange={(e) => setToken(e.target.value)}
           style={{ width: "400px", padding: "8px", marginRight: "10px" }}
         />
-        <button onClick={getSession}>Buscar sesión</button>
+        <button onClick={getSession} style={{ marginRight: "10px" }}>
+          Buscar sesión
+        </button>
+        <button onClick={checkoutSession}>
+          Checkout
+        </button>
       </div>
 
       {error && (
