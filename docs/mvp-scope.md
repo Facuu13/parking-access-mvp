@@ -2,32 +2,55 @@
 
 ## 🎯 Objetivo
 
-Construir un sistema funcional que permita controlar el acceso a un estacionamiento mediante QR, pago digital y apertura remota de una barrera.
+Construir un sistema funcional de estacionamiento que permita:
+
+* Registrar el ingreso de un vehículo
+* Generar un ticket digital (token)
+* Calcular el costo en base al tiempo de permanencia
+* Permitir el pago al momento de salida
+* Controlar la apertura de la barrera
 
 ---
 
 ## ✅ Funcionalidades incluidas
 
-### Acceso mediante QR
+### Entrada
 
-* Generación o uso de un QR para acceso
-* Creación de sesión al escanear
+* Escaneo de QR de entrada
+* Creación de sesión
+* Generación de token único (ticket digital)
+* Registro de hora de entrada
+* Apertura de barrera
+
+---
 
 ### Gestión de sesiones
 
-* Creación de sesión de acceso
-* Consulta de estado de sesión
-* Asociación con pago
+* Consulta de sesión por token
+* Estado de sesión:
+
+  * ACTIVE
+  * PENDING_PAYMENT
+  * COMPLETED
+
+---
+
+### Salida
+
+* Consulta de sesión activa
+* Cálculo de duración
+* Cálculo de monto a pagar
+* Cambio de estado a PENDING_PAYMENT
+
+---
 
 ### Pagos (fase inicial)
 
 * Simulación de pago aprobado
-* Cambio de estado de la sesión tras el pago
+* Asociación del pago a la sesión
+* Cambio de estado a COMPLETED
 
-### Autorización de apertura
-
-* Generación de comando de apertura
-* Validación de estado (solo si pago aprobado)
+---
 
 ### Dispositivo IoT
 
@@ -36,54 +59,51 @@ Construir un sistema funcional que permita controlar el acceso a un estacionamie
 * Consulta de comandos
 * Ejecución de apertura (simulada)
 
+---
+
 ### Registro de eventos
 
-* Registro de:
-
-  * creación de sesión
-  * pago
-  * apertura
-  * heartbeat
-
-### Dashboard básico (opcional MVP)
-
-* Visualización de sesiones
-* Estado de dispositivos
-* Eventos recientes
+* Creación de sesión
+* Cálculo de salida
+* Pago
+* Apertura
+* Heartbeat
 
 ---
 
-## ❌ Funcionalidades fuera de alcance (por ahora)
+## ❌ Fuera de alcance (por ahora)
 
 * App móvil nativa
-* Integración completa con hardware real desde el inicio
-* Reconocimiento de patentes
+* Reconocimiento de patente
 * Facturación electrónica
-* Multi-sede compleja
-* Seguridad avanzada (roles, auth completa)
-* Alta disponibilidad / escalabilidad
+* Multi-sede
+* Sistema de usuarios/login
+* Seguridad avanzada
+* Alta disponibilidad
 
 ---
 
 ## 🔄 Fases futuras
 
-* Integración con MercadoPago (sandbox → producción)
-* Firmware completo en ESP32 (ESP-IDF)
-* Comunicación vía MQTT
-* OTA updates
-* Autenticación de usuarios/admin
-* Panel administrativo completo
+* Integración con MercadoPago
+* Firmware completo en ESP32
+* Comunicación MQTT
+* OTA
+* Dashboard avanzado
+* Identificación por patente
 
 ---
 
 ## 📌 Criterio de éxito del MVP
 
-El sistema se considera funcional si:
+El sistema es válido si:
 
-1. Se puede crear una sesión desde un QR
-2. Se puede simular un pago exitoso
-3. Se genera una orden de apertura
-4. Un dispositivo (simulado) ejecuta la apertura
-5. Todo el flujo queda registrado en el sistema
+1. Se puede generar una sesión al ingresar
+2. Se genera un token único por sesión
+3. Se puede calcular correctamente el costo al salir
+4. Se puede simular el pago
+5. Se genera una orden de apertura
+6. El dispositivo ejecuta la apertura
+7. Todo queda registrado
 
 ---

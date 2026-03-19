@@ -2,25 +2,39 @@
 
 ## 🧩 Visión general
 
-El sistema está compuesto por tres grandes bloques:
+El sistema está compuesto por:
 
 1. Frontend (usuario)
-2. Backend (API y lógica)
+2. Backend (API + lógica de negocio)
 3. Dispositivo IoT (ESP32 o simulador)
+4. Base de datos (PostgreSQL)
 
 ---
 
 ## 🔁 Flujo principal
 
-1. Usuario escanea QR
+### Entrada
+
+1. Usuario escanea QR de entrada
+2. Frontend llama al backend
+3. Backend crea sesión
+4. Backend genera token único
+5. Backend registra hora de entrada
+6. Backend envía comando de apertura
+7. Dispositivo abre la barrera
+
+---
+
+### Salida
+
+1. Usuario accede a su ticket (token)
 2. Frontend consulta al backend
-3. Backend crea una sesión
-4. Usuario realiza el pago
-5. Backend valida el pago
-6. Backend autoriza apertura
-7. Dispositivo consulta comandos
-8. Dispositivo ejecuta apertura
-9. Backend registra evento
+3. Backend calcula duración
+4. Backend calcula monto
+5. Usuario realiza pago
+6. Backend valida pago
+7. Backend envía comando de apertura
+8. Dispositivo abre la barrera
 
 ---
 
@@ -28,37 +42,42 @@ El sistema está compuesto por tres grandes bloques:
 
 ### Frontend
 
-* Aplicación web (React)
-* Interfaz mobile-first
-* Comunicación con backend vía HTTP
+* React
+* Mobile-first
+* Muestra:
+
+  * estado de sesión
+  * tiempo transcurrido
+  * monto a pagar
+  * estado de pago
 
 ---
 
 ### Backend
 
-* API REST (FastAPI)
-* Manejo de:
+* FastAPI
+* Maneja:
 
   * sesiones
   * pagos
   * dispositivos
   * comandos
   * eventos
-* Integración futura con sistema de pagos
 
 ---
 
 ### Base de datos
 
 * PostgreSQL
-* Almacena:
 
-  * sesiones
-  * pagos
-  * dispositivos
-  * comandos
-  * heartbeats
-  * logs
+Tablas principales:
+
+* access_sessions
+* payments
+* devices
+* gate_commands
+* heartbeats
+* event_logs
 
 ---
 
@@ -70,69 +89,74 @@ El sistema está compuesto por tres grandes bloques:
 
 #### Fase 2
 
-* ESP32 con ESP-IDF:
+* ESP32 (ESP-IDF):
 
-  * conexión WiFi
-  * envío de heartbeat
-  * polling de comandos
-  * control de GPIO (relé/LED)
+  * WiFi
+  * polling HTTP
+  * control GPIO
+
+---
+
+## 🔑 Token (ticket digital)
+
+Cada sesión genera un token único:
+
+* identifica la sesión
+* permite recuperar información
+* se usa para el flujo de salida
+
+Ejemplo:
+
+```
+/session/{token}
+```
 
 ---
 
 ## 🔌 Comunicación
 
-### MVP inicial
+### MVP
 
 * HTTP REST
 
 ### Futuro
 
-* MQTT para eventos en tiempo real
+* MQTT
 
 ---
 
 ## 📡 Heartbeat
 
-El dispositivo envía periódicamente su estado al backend:
+El dispositivo envía periódicamente:
 
-* online/offline
+* estado (online/offline)
 * timestamp
-* estado actual
 
-Esto permite detectar dispositivos desconectados.
+Permite detectar desconexión.
 
 ---
 
-## 🔓 Comando de apertura
+## 🚧 Comandos de apertura
 
-El backend genera un comando cuando:
+El backend genera comandos cuando:
 
-* el pago está aprobado
+* vehículo entra
+* pago es aprobado
 
 El dispositivo:
 
-* consulta si hay comandos pendientes
+* consulta comandos pendientes
 * ejecuta apertura
 * reporta resultado
 
 ---
 
-## 🧾 Eventos
-
-Se registran eventos clave:
-
-* creación de sesión
-* pago aprobado/rechazado
-* apertura ejecutada
-* heartbeat recibido
-
----
-
 ## ⚠️ Consideraciones
 
-* El sistema debe evitar aperturas duplicadas
-* Los comandos deben ser idempotentes
-* El dispositivo puede estar offline
-* El backend debe manejar estados inconsistentes
+* Evitar aperturas duplicadas
+* Manejar sesiones sin pago
+* Manejar dispositivos offline
+* Asegurar consistencia de estados
+* Token debe ser único y no predecible
 
 ---

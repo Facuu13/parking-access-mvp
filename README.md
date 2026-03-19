@@ -1,17 +1,21 @@
 # Parking Access MVP
 
-Sistema de acceso automatizado para estacionamientos basado en QR, pagos digitales y control remoto de barrera mediante dispositivos IoT.
+Sistema de acceso automatizado para estacionamientos basado en QR, sesiones digitales y pago al momento de la salida.
+
+---
 
 ## 🚀 Descripción
 
 Este proyecto implementa un MVP de un sistema que permite a los usuarios:
 
-1. Escanear un código QR al ingresar a un estacionamiento
-2. Realizar un pago digital (sin efectivo ni app nativa)
-3. Obtener autorización automática de acceso/salida
-4. Activar la apertura de una barrera de forma remota
+1. Escanear un código QR al ingresar al estacionamiento
+2. Generar automáticamente una sesión (ticket digital)
+3. Permanecer en el estacionamiento sin necesidad de pago previo
+4. Al salir, calcular el costo en base al tiempo de uso
+5. Realizar el pago digital
+6. Obtener autorización automática para abrir la barrera
 
-El sistema está diseñado para operar sin personal en sitio (24/7), utilizando una arquitectura basada en backend + frontend + dispositivos IoT.
+El sistema está diseñado para operar de forma autónoma (24/7), sin intervención humana.
 
 ---
 
@@ -36,23 +40,29 @@ El sistema está diseñado para operar sin personal en sitio (24/7), utilizando 
 
 ---
 
+## 🔁 Flujo principal
+
+### Entrada
+
+QR → creación de sesión → generación de ticket digital → apertura de barrera
+
+### Salida
+
+ticket → cálculo de tiempo → cálculo de monto → pago → apertura de barrera
+
+---
+
 ## 🎯 Objetivo del MVP
 
 Validar el flujo completo:
 
-QR → sesión → pago → autorización → apertura → registro
+Entrada → sesión → salida → cálculo → pago → apertura → registro
 
 ---
 
 ## 📌 Estado del proyecto
 
 🟡 En desarrollo — fase de diseño y arquitectura
-
----
-
-## 📁 Estructura del repositorio
-
-(En construcción)
 
 ---
 
@@ -71,7 +81,7 @@ QR → sesión → pago → autorización → apertura → registro
 
 ## 📄 Documentación
 
-Ver carpeta `docs/` para más detalles:
+Ver carpeta `docs/`:
 
 * Alcance del MVP
 * Arquitectura del sistema
@@ -81,10 +91,9 @@ Ver carpeta `docs/` para más detalles:
 
 ## 💡 Objetivo del proyecto
 
-Este proyecto busca:
-
-* Construir un sistema real de IoT + backend + pagos
-* Generar una base para un producto vendible
-* Servir como portfolio técnico completo
+* Construir un sistema real IoT + backend + pagos
+* Simular un sistema de estacionamiento autónomo
+* Generar un producto potencialmente vendible
+* Crear un proyecto fuerte de portfolio
 
 ---
