@@ -85,6 +85,30 @@ function App() {
     }
   }
 
+  const paySession = async () => {
+    try {
+      setError("")
+
+      if (!token.trim()) {
+        throw new Error("Ingresá un token")
+      }
+
+      const response = await fetch(`${API_URL}/sessions/${token}/pay`, {
+        method: "POST",
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || "No se pudo realizar el pago")
+      }
+
+      const data = await response.json()
+      setSession(data)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h1>Parking Access MVP</h1>
@@ -104,9 +128,13 @@ function App() {
         <button onClick={getSession} style={{ marginRight: "10px" }}>
           Buscar sesión
         </button>
-        <button onClick={checkoutSession}>
+        <button onClick={checkoutSession} style={{ marginRight: "10px" }}>
           Checkout
         </button>
+        <button onClick={paySession}>
+          Pagar
+        </button>
+
       </div>
 
       {error && (
