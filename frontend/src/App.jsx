@@ -3,7 +3,7 @@ import { useState } from "react"
 const API_URL = "http://127.0.0.1:8000"
 
 function App() {
-  const [token, setToken] = useState(null)
+  const [token, setToken] = useState("")
   const [session, setSession] = useState(null)
   const [error, setError] = useState("")
 
@@ -33,11 +33,46 @@ function App() {
     }
   }
 
+  const getSession = async () => {
+    try {
+      setError("")
+
+      if (!token.trim()) {
+        throw new Error("Ingresá un token")
+      }
+
+      const response = await fetch(`${API_URL}/sessions/${token}`)
+
+      if (!response.ok) {
+        throw new Error("No se pudo obtener la sesión")
+      }
+
+      const data = await response.json()
+      setSession(data)
+    } catch (err) {
+      setError(err.message)
+      setSession(null)
+    }
+  }
+
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h1>Parking Access MVP</h1>
 
-      <button onClick={createEntry}>Crear entrada</button>
+      <div style={{ marginBottom: "20px" }}>
+        <button onClick={createEntry}>Crear entrada</button>
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Ingresar token"
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
+          style={{ width: "400px", padding: "8px", marginRight: "10px" }}
+        />
+        <button onClick={getSession}>Buscar sesión</button>
+      </div>
 
       {error && (
         <p style={{ color: "red" }}>
