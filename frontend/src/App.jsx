@@ -14,6 +14,8 @@ function App() {
     try {
       setError("")
       setLoading(true)
+      setSession(null)
+      setCopied(false)
 
       const response = await fetch(`${API_URL}/entry`, {
         method: "POST",
@@ -245,38 +247,49 @@ function App() {
 
             {/* Action Buttons */}
             <div className="button-grid">
-              <button 
-                onClick={createEntry}
-                disabled={loading}
-                className="btn btn-primary"
-                title="Crear una nueva sesión"
-              >
-                {loading ? "Cargando..." : "🚗 Crear Entrada"}
-              </button>
-              <button 
-                onClick={getSession}
-                disabled={loading}
-                className="btn btn-secondary"
-                title="Obtener información de la sesión"
-              >
-                {loading ? "Cargando..." : "🔍 Buscar Sesión"}
-              </button>
-              <button 
-                onClick={checkoutSession}
-                disabled={loading}
-                className="btn btn-warning"
-                title="Registrar salida"
-              >
-                {loading ? "Cargando..." : "🚪 Checkout"}
-              </button>
-              <button 
-                onClick={paySession}
-                disabled={loading}
-                className="btn btn-success"
-                title="Procesar pago"
-              >
-                {loading ? "Cargando..." : "💳 Pagar"}
-              </button>
+              {(!session || session.status === "COMPLETED") && (
+                <button 
+                  onClick={createEntry}
+                  disabled={loading}
+                  className="btn btn-primary"
+                  title="Crear una nueva sesión"
+                >
+                  {loading ? "Cargando..." : "🚗 Crear Entrada"}
+                </button>
+              )}
+              
+              {session && session.status === "ACTIVE" && (
+                <button 
+                  onClick={checkoutSession}
+                  disabled={loading}
+                  className="btn btn-warning"
+                  title="Registrar salida"
+                >
+                  {loading ? "Cargando..." : "🚪 Checkout"}
+                </button>
+              )}
+              
+              {session && session.status === "PENDING_PAYMENT" && (
+                <button 
+                  onClick={paySession}
+                  disabled={loading}
+                  className="btn btn-success"
+                  title="Procesar pago"
+                >
+                  {loading ? "Cargando..." : "💳 Pagar"}
+                </button>
+              )}
+              
+              {token && (
+                <button 
+                  onClick={getSession}
+                  disabled={loading}
+                  className="btn btn-secondary"
+                  title="Obtener información de la sesión"
+                >
+                  {loading ? "Cargando..." : "🔍 Actualizar"}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -294,6 +307,36 @@ function App() {
               </div>
             </div>
             <div className="card-body">
+              {session?.status === "COMPLETED" && (
+                <div className="status-message completed">
+                  <span>✅</span>
+                  <div>
+                    <strong>Sesión Completada</strong>
+                    <p>Esta sesión ha sido procesada correctamente.</p>
+                  </div>
+                </div>
+              )}
+
+              {session?.status === "ACTIVE" && (
+                <div className="status-message info">
+                  <span>🚗</span>
+                  <div>
+                    <strong>Sesión Activa</strong>
+                    <p>El vehículo está dentro del estacionamiento.</p>
+                  </div>
+                </div>
+              )}
+
+              {session?.status === "PENDING_PAYMENT" && (
+                <div className="status-message warning">
+                  <span>⏳</span>
+                  <div>
+                    <strong>Pago Pendiente</strong>
+                    <p>La sesión está lista para pagar.</p>
+                  </div>
+                </div>
+              )}
+
               {/* Timeline */}
               {getSessionTimeline().length > 0 && (
                 <div className="timeline">

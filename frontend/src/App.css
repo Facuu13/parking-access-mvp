@@ -412,7 +412,51 @@ body {
   white-space: pre;
 }
 
-/* Timeline */
+/* Status Messages */
+.status-message {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  border: 2px solid;
+}
+
+.status-message span {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.status-message strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--text-h);
+}
+
+.status-message p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.status-message.completed {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.status-message.info {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.status-message.warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: var(--warning);
+  color: var(--warning);
+}
 .timeline {
   margin-bottom: 2rem;
 }
