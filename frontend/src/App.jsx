@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 const API_URL = "http://127.0.0.1:8000"
 
@@ -109,50 +109,151 @@ function App() {
     }
   }
 
+  useEffect(() => {
+    if (!token.trim()) return
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(`${API_URL}/sessions/${token}`)
+        if (!response.ok) return
+
+        const data = await response.json()
+        setSession(data)
+      } catch {
+        // ignoramos error temporal de red
+      }
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [token])
+
+  const statusColor =
+    session?.status === "COMPLETED"
+      ? "#16a34a"
+      : session?.status === "PAID"
+      ? "#2563eb"
+      : session?.status === "PENDING_PAYMENT"
+      ? "#d97706"
+      : "#6b7280"
+
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+    <div
+      style={{
+        padding: "24px",
+        fontFamily: "Arial, sans-serif",
+        maxWidth: "900px",
+        margin: "0 auto",
+      }}
+    >
       <h1>Parking Access MVP</h1>
+      <p>Flujo básico de entrada, checkout, pago y salida automática.</p>
 
-      <div style={{ marginBottom: "20px" }}>
-        <button onClick={createEntry}>Crear entrada</button>
-      </div>
+      <div
+        style={{
+          border: "1px solid #ccc",
+          borderRadius: "10px",
+          padding: "16px",
+          marginBottom: "20px",
+        }}
+      >
+        <h2>Acciones</h2>
 
-      <div style={{ marginBottom: "20px" }}>
+        <div style={{ marginBottom: "16px" }}>
+          <button onClick={createEntry} style={{ marginRight: "10px" }}>
+            Crear entrada
+          </button>
+
+          <button onClick={getSession} style={{ marginRight: "10px" }}>
+            Buscar sesión
+          </button>
+
+          <button onClick={checkoutSession} style={{ marginRight: "10px" }}>
+            Checkout
+          </button>
+
+          <button onClick={paySession}>
+            Pagar
+          </button>
+        </div>
+
         <input
           type="text"
           placeholder="Ingresar token"
           value={token}
           onChange={(e) => setToken(e.target.value)}
-          style={{ width: "400px", padding: "8px", marginRight: "10px" }}
+          style={{
+            width: "100%",
+            maxWidth: "500px",
+            padding: "10px",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+          }}
         />
-        <button onClick={getSession} style={{ marginRight: "10px" }}>
-          Buscar sesión
-        </button>
-        <button onClick={checkoutSession} style={{ marginRight: "10px" }}>
-          Checkout
-        </button>
-        <button onClick={paySession}>
-          Pagar
-        </button>
-
       </div>
 
       {error && (
-        <p style={{ color: "red" }}>
+        <div
+          style={{
+            backgroundColor: "#fee2e2",
+            color: "#991b1b",
+            padding: "12px",
+            borderRadius: "8px",
+            marginBottom: "20px",
+          }}
+        >
           {error}
-        </p>
+        </div>
       )}
 
       {token && (
-        <div style={{ marginTop: "20px" }}>
-          <p><strong>Token:</strong> {token}</p>
+        <div
+          style={{
+            border: "1px solid #ccc",
+            borderRadius: "10px",
+            padding: "16px",
+            marginBottom: "20px",
+          }}
+        >
+          <h2>Token actual</h2>
+          <p style={{ wordBreak: "break-all" }}>{token}</p>
         </div>
       )}
 
       {session && (
-        <div style={{ marginTop: "20px" }}>
-          <h2>Respuesta del backend</h2>
-          <pre>{JSON.stringify(session, null, 2)}</pre>
+        <div
+          style={{
+            border: "1px solid #ccc",
+            borderRadius: "10px",
+            padding: "16px",
+          }}
+        >
+          <h2>Estado de la sesión</h2>
+
+          <p>
+            <strong>Estado:</strong>{" "}
+            <span style={{ color: statusColor }}>{session.status}</span>
+          </p>
+          <p><strong>Estado de pago:</strong> {session.payment_status}</p>
+          <p><strong>Hora de entrada:</strong> {session.entry_time || "-"}</p>
+          <p><strong>Hora de salida:</strong> {session.exit_time || "-"}</p>
+          <p><strong>Duración (min):</strong> {session.duration_minutes ?? "-"}</p>
+          <p><strong>Tarifa por hora:</strong> {session.hourly_rate ?? "-"}</p>
+          <p><strong>Total:</strong> {session.total_amount ?? "-"}</p>
+          <p><strong>Apertura entrada:</strong> {String(session.opened_on_entry)}</p>
+          <p><strong>Apertura salida:</strong> {String(session.opened_on_exit)}</p>
+
+          <h3>JSON completo</h3>
+          <pre
+            style={{
+              backgroundColor: "#111827",
+              color: "#f9fafb",
+              padding: "12px",
+              borderRadius: "8px",
+              overflowX: "auto",
+            }}
+          >
+            {JSON.stringify(session, null, 2)}
+          </pre>
         </div>
       )}
     </div>
