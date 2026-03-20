@@ -8,6 +8,7 @@ function App() {
   const [session, setSession] = useState(null)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const createEntry = async () => {
     try {
@@ -151,6 +152,33 @@ function App() {
     return colors[status] || colors.PENDING
   }
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(token)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const getSessionTimeline = () => {
+    const events = []
+    if (session?.entry_time) {
+      events.push({
+        label: "Entrada",
+        time: new Date(session.entry_time),
+        icon: "🚗",
+        status: "completed"
+      })
+    }
+    if (session?.exit_time) {
+      events.push({
+        label: "Salida",
+        time: new Date(session.exit_time),
+        icon: "🚪",
+        status: session.payment_status === "PAID" ? "completed" : "pending"
+      })
+    }
+    return events
+  }
+
   const statusStyle = session && getStatusColor(session.status)
 
   return (
@@ -204,6 +232,13 @@ function App() {
               {token && (
                 <div className="token-display">
                   <code>{token}</code>
+                  <button 
+                    onClick={copyToClipboard}
+                    className="token-copy-btn"
+                    title="Copiar token"
+                  >
+                    {copied ? "✓ Copiado" : "📋 Copiar"}
+                  </button>
                 </div>
               )}
             </div>
@@ -259,10 +294,32 @@ function App() {
               </div>
             </div>
             <div className="card-body">
+              {/* Timeline */}
+              {getSessionTimeline().length > 0 && (
+                <div className="timeline">
+                  <h3>📊 Flujo de la Sesión</h3>
+                  <div className="timeline-container">
+                    {getSessionTimeline().map((event, idx) => (
+                      <div key={idx} className="timeline-event">
+                        <div className="timeline-marker" data-status={event.status}>
+                          {event.icon}
+                        </div>
+                        <div className="timeline-content">
+                          <p className="timeline-label">{event.label}</p>
+                          <time className="timeline-time">
+                            {event.time.toLocaleTimeString("es-AR")}
+                          </time>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="info-grid">
                 {/* Main Info */}
                 <div className="info-card">
-                  <h3>📊 Información Principal</h3>
+                  <h3>📋 Información</h3>
                   <div className="info-row">
                     <span className="info-label">Estado:</span>
                     <span className="info-value" style={{ color: statusStyle.color }}>
@@ -281,26 +338,9 @@ function App() {
                   </div>
                 </div>
 
-                {/* Time Info */}
+                {/* Cost Info */}
                 <div className="info-card">
-                  <h3>⏰ Horarios</h3>
-                  <div className="info-row">
-                    <span className="info-label">Entrada:</span>
-                    <span className="info-value">
-                      {session.entry_time ? new Date(session.entry_time).toLocaleTimeString("es-AR") : "-"}
-                    </span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">Salida:</span>
-                    <span className="info-value">
-                      {session.exit_time ? new Date(session.exit_time).toLocaleTimeString("es-AR") : "-"}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Payment Info */}
-                <div className="info-card">
-                  <h3>💰 Tarifa</h3>
+                  <h3>💰 Cobro</h3>
                   <div className="info-row">
                     <span className="info-label">Tarifa/hora:</span>
                     <span className="info-value">
@@ -315,24 +355,26 @@ function App() {
                   </div>
                 </div>
 
-                {/* Gate Info */}
-                <div className="info-card">
-                  <h3>🚪 Puertas</h3>
-                  <div className="info-row">
-                    <span className="info-label">Abierta entrada:</span>
-                    <span className="info-value">{String(session.opened_on_entry)}</span>
-                  </div>
-                  <div className="info-row">
-                    <span className="info-label">Abierta salida:</span>
-                    <span className="info-value">{String(session.opened_on_exit)}</span>
+                {/* Gates Status */}
+                <div className="info-card gates-card">
+                  <h3>🚪 Control de Acceso</h3>
+                  <div className="gate-indicator">
+                    <div className={`gate ${session.opened_on_entry ? "opened" : "closed"}`}>
+                      <span className="gate-icon">🚪</span>
+                      <span className="gate-label">Entrada</span>
+                      <span className="gate-status">
+                        {session.opened_on_entry ? "Abierta ✓" : "Cerrada"}
+                      </span>
+                    </div>
+                    <div className={`gate ${session.opened_on_exit ? "opened" : "closed"}`}>
+                      <span className="gate-icon">🚪</span>
+                      <span className="gate-label">Salida</span>
+                      <span className="gate-status">
+                        {session.opened_on_exit ? "Abierta ✓" : "Cerrada"}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Raw JSON */}
-              <div className="json-section">
-                <h3>📋 Datos Completos (JSON)</h3>
-                <pre className="json-display">{JSON.stringify(session, null, 2)}</pre>
               </div>
             </div>
           </div>
